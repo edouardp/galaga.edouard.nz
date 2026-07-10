@@ -46,8 +46,8 @@ DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
 
 echo "Syncing to S3 bucket: $BUCKET"
 
-# Sync assets with long cache (filenames are content-hashed)
-aws s3 sync dist/assets/ "s3://$BUCKET/assets/" \
+# Sync /e/ (runtime assets) with long cache
+aws s3 sync dist/e/ "s3://$BUCKET/e/" \
   --cache-control "public, max-age=31536000, immutable" \
   --size-only
 
@@ -56,16 +56,13 @@ aws s3 sync dist/notebooks/ "s3://$BUCKET/notebooks/" \
   --cache-control "public, max-age=60" \
   --delete
 
-# Sync root files (index.html, favicons) with short cache
-aws s3 sync dist/ "s3://$BUCKET/" \
-  --exclude "assets/*" \
-  --exclude "notebooks/*" \
-  --cache-control "public, max-age=60" \
-  --delete
+# Sync root index.html (short cache)
+aws s3 cp dist/index.html "s3://$BUCKET/index.html" \
+  --cache-control "public, max-age=60"
 
 echo "Invalidating CloudFront cache..."
 aws cloudfront create-invalidation \
   --distribution-id "$DISTRIBUTION_ID" \
-  --paths "/*"
+  --paths "/index.html" "/notebooks/*"
 
 echo "Deployment complete! Site: https://galaga.edouard.nz"
