@@ -39,6 +39,7 @@ aws cloudformation deploy \
   --stack-name "$STACK_NAME" \
   --region "$REGION" \
   --parameter-overrides "HostedZoneId=$HOSTED_ZONE_ID" \
+  --capabilities CAPABILITY_IAM \
   --no-fail-on-empty-changeset
 
 echo "Infrastructure deployment complete!"

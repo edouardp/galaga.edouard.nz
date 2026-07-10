@@ -68,6 +68,122 @@ Resources:
               Value: require-corp
               Override: true
 
+  LambdaEdgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3ReadAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub ${SiteBucket.Arn}/*
+
+  NotebookLoaderFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: galaga-notebook-loader
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt LambdaEdgeRole.Arn
+      Timeout: 10
+      MemorySize: 256
+      Code:
+        ZipFile: |
+          import boto3
+          import urllib.parse
+          import re
+
+          s3 = boto3.client('s3')
+          BUCKET = 'galaga.edouard.nz'
+
+          def handler(event, context):
+              request = event['Records'][0]['cf']['request']
+              params = urllib.parse.parse_qs(request.get('querystring', ''))
+
+              nb = params.get('nb', [None])[0]
+              if not nb:
+                  # No ?nb= param, let it pass through to S3 (landing page)
+                  return request
+
+              # Sanitize notebook name
+              nb = re.sub(r'[^a-zA-Z0-9_-]', '', nb)
+
+              try:
+                  # Fetch the template and notebook
+                  template = s3.get_object(Bucket=BUCKET, Key='e/index.html')['Body'].read().decode('utf-8')
+                  notebook = s3.get_object(Bucket=BUCKET, Key=f'notebooks/{nb}.py')['Body'].read().decode('utf-8')
+              except s3.exceptions.NoSuchKey:
+                  return {
+                      'status': '404',
+                      'statusDescription': 'Not Found',
+                      'headers': {'content-type': [{'value': 'text/html'}]},
+                      'body': f'<html><body><h1>Notebook "{nb}" not found</h1><a href="/">Back</a></body></html>',
+                  }
+
+              # Escape the notebook code for JSON embedding
+              escaped = notebook.replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n').replace('\r', '\\r')
+
+              # Inject into template
+              html = template.replace('notebookCode: ""', f'notebookCode: "{escaped}"')
+
+              # Also set the marimo-code element
+              encoded = urllib.parse.quote(notebook)
+              html = re.sub(
+                  r'(<marimo-code hidden="">)(</marimo-code>)',
+                  rf'\1{encoded}\2',
+                  html,
+              )
+
+              return {
+                  'status': '200',
+                  'statusDescription': 'OK',
+                  'headers': {
+                      'content-type': [{'value': 'text/html; charset=utf-8'}],
+                      'cache-control': [{'value': 'public, max-age=60'}],
+                      'cross-origin-opener-policy': [{'value': 'same-origin'}],
+                      'cross-origin-embedder-policy': [{'value': 'require-corp'}],
+                  },
+                  'body': html,
+              }
+
+  NotebookLoaderVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      FunctionName: !Ref NotebookLoaderFunction
+
+  CachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: galaga-cache-policy
+        DefaultTTL: 86400
+        MaxTTL: 31536000
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: whitelist
+            QueryStrings:
+              - nb
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
   SiteDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -91,8 +207,12 @@ Resources:
           AllowedMethods: [GET, HEAD]
           CachedMethods: [GET, HEAD]
           Compress: true
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          CachePolicyId: !Ref CachePolicy
           ResponseHeadersPolicyId: !Ref ResponseHeadersPolicy
+          LambdaFunctionAssociations:
+            - EventType: origin-request
+              LambdaFunctionARN: !Ref NotebookLoaderVersion
+              IncludeBody: false
         CustomErrorResponses:
           - ErrorCode: 403
             ResponseCode: 404
