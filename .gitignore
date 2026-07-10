@@ -1,6 +1,10 @@
 # Build output
 dist/
 
+# marimo session state
+__marimo__/
+notebooks/__marimo__/
+
 # Python-generated files
 __pycache__/
 *.py[oc]

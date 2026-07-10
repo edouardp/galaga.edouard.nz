@@ -23,8 +23,11 @@ def main():
     dist_dir = Path(sys.argv[1])
     notebooks_dir = dist_dir / "notebooks"
 
-    # Get list of notebooks
-    notebooks = sorted([f.stem for f in notebooks_dir.glob("*.py")])
+    # Get list of notebooks (recursive, preserving subdirectory paths)
+    notebooks = sorted([
+        str(f.relative_to(notebooks_dir)).removesuffix('.py')
+        for f in notebooks_dir.rglob("*.py")
+    ])
     notebooks_json = json.dumps(notebooks)
 
     # The /e/ directory is already the raw marimo export (with empty code).
@@ -87,7 +90,7 @@ def main():
           '<div class="landing">' +
           '<h1>galaga.edouard.nz</h1>' +
           '<p>Interactive marimo notebooks running Python 3.14 via WebAssembly.</p>' +
-          '<ul>' + notebooks.map(function(n) {{ return '<li><a href="?nb=' + n + '">' + n.replace(/[_-]/g, ' ') + '</a></li>'; }}).join('') + '</ul>' +
+          '<ul>' + notebooks.map(function(n) {{ return '<li><a href="?nb=' + encodeURIComponent(n) + '">' + n.replace(/[_\\-]/g, ' ') + '</a></li>'; }}).join('') + '</ul>' +
           '</div>';
         return;
       }}

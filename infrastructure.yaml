@@ -118,8 +118,11 @@ Resources:
                   # No ?nb= param, let it pass through to S3 (landing page)
                   return request
 
-              # Sanitize notebook name
-              nb = re.sub(r'[^a-zA-Z0-9_-]', '', nb)
+              # Sanitize notebook name (allow alphanumerics, underscores, hyphens, slashes)
+              nb = re.sub(r'[^a-zA-Z0-9_/.-]', '', nb)
+              nb = nb.strip('/')  # no leading/trailing slashes
+              if '..' in nb:
+                  return request  # prevent path traversal
 
               try:
                   # Fetch the template and notebook
