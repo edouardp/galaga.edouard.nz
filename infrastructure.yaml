@@ -147,6 +147,14 @@ Resources:
                   html,
               )
 
+              # Fix relative paths (template lives at /e/ but served from /)
+              html = html.replace('"./assets/', '"./e/assets/')
+              html = html.replace('"./favicon', '"./e/favicon')
+              html = html.replace('"./apple-touch-icon', '"./e/apple-touch-icon')
+              html = html.replace('"./manifest.json', '"./e/manifest.json')
+              html = html.replace('"./logo.png', '"./e/logo.png')
+              html = html.replace('"./site.webmanifest', '"./e/site.webmanifest')
+
               return {
                   'status': '200',
                   'statusDescription': 'OK',
@@ -161,8 +169,10 @@ Resources:
 
   NotebookLoaderVersion:
     Type: AWS::Lambda::Version
+    DeletionPolicy: Retain
     Properties:
       FunctionName: !Ref NotebookLoaderFunction
+      Description: !Sub "Version for ${NotebookLoaderFunction}"
 
   CachePolicy:
     Type: AWS::CloudFront::CachePolicy
