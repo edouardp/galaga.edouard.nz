@@ -113,6 +113,47 @@ def main():
       .landing a:hover {{ text-decoration: underline; }}
     </style>
 
+    <script data-marimo="true">
+      // Synchronous notebook loader - must run before module script
+      (function() {{
+        var params = new URLSearchParams(window.location.search);
+        var nb = params.get('nb');
+
+        if (!nb) {{
+          window.__GALAGA_LANDING__ = true;
+          return;
+        }}
+
+        // Synchronous XHR to fetch notebook code BEFORE module loads
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', './notebooks/' + nb + '.py', false);
+        xhr.send();
+
+        if (xhr.status !== 200) {{
+          window.__GALAGA_LANDING__ = true;
+          window.__GALAGA_ERROR__ = 'Notebook "' + nb + '" not found';
+          return;
+        }}
+
+        var code = xhr.responseText;
+
+        // Set the export context synchronously
+        Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {{
+          value: Object.freeze({{ trusted: true, notebookCode: code }}),
+          writable: false, configurable: false,
+        }});
+
+        // Set marimo-code element
+        document.querySelector('marimo-code').textContent = encodeURIComponent(code);
+
+        // Set the mount config
+        Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {{
+          value: Object.freeze({mount_config}),
+          writable: false, configurable: false,
+        }});
+      }})();
+    </script>
+
     <marimo-code hidden=""></marimo-code>
 
     <marimo-wasm hidden=""></marimo-wasm>
@@ -125,63 +166,35 @@ def main():
       #save-button {{ display: none !important; }}
       #filename-input {{ display: none !important; }}
     </style>
+
+    <script>
+      // Only load the marimo runtime if we have a notebook
+      if (!window.__GALAGA_LANDING__) {{
+        document.write('<script type="module" crossorigin src="./{main_js}"><\\/script>');
+      }}
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
 
     <script data-marimo="true">
-      (function() {{
-        var params = new URLSearchParams(window.location.search);
-        var nb = params.get('nb');
+      // Landing page or error rendering
+      if (window.__GALAGA_LANDING__) {{
         var notebooks = {notebooks_json};
-
-        if (!nb) {{
-          // Landing page - don't load the heavy runtime
+        if (window.__GALAGA_ERROR__) {{
+          document.getElementById('root').innerHTML =
+            '<div class="landing"><h1>Notebook not found</h1><p>' +
+            window.__GALAGA_ERROR__ + '</p><p><a href="./">Back to notebooks</a></p></div>';
+        }} else {{
           document.getElementById('root').innerHTML =
             '<div class="landing">' +
             '<h1>galaga.edouard.nz</h1>' +
             '<p>Interactive marimo notebooks running Python 3.14 via WebAssembly.</p>' +
             '<ul>' + notebooks.map(function(n) {{ return '<li><a href="?nb=' + n + '">' + n.replace(/[_-]/g, ' ') + '</a></li>'; }}).join('') + '</ul>' +
             '</div>';
-          return;
         }}
-
-        // Fetch notebook, configure context, then boot runtime
-        fetch('./notebooks/' + nb + '.py')
-          .then(function(r) {{
-            if (!r.ok) throw new Error('Notebook "' + nb + '" not found');
-            return r.text();
-          }})
-          .then(function(code) {{
-            // Set the export context with notebook code
-            Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {{
-              value: Object.freeze({{ trusted: true, notebookCode: code }}),
-              writable: false, configurable: false,
-            }});
-
-            // Set marimo-code element (URL-encoded)
-            document.querySelector('marimo-code').textContent = encodeURIComponent(code);
-
-            // Set the mount config - MUST use "notebook.py" as filename
-            Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {{
-              value: Object.freeze({mount_config}),
-              writable: false, configurable: false,
-            }});
-
-            // NOW load the marimo runtime module
-            var script = document.createElement('script');
-            script.type = 'module';
-            script.crossOrigin = '';
-            script.src = './{main_js}';
-            document.head.appendChild(script);
-          }})
-          .catch(function(err) {{
-            document.getElementById('root').innerHTML =
-              '<div class="landing"><h1>Notebook not found</h1><p>' +
-              err.message + '</p><p><a href="./">Back to notebooks</a></p></div>';
-          }});
-      }})();
+      }}
     </script>
   </body>
 </html>"""
