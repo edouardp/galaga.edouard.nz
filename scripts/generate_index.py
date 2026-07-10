@@ -29,16 +29,16 @@ def main():
     e_index = e_dir / "index.html"
     
     if e_index.exists():
-        # Read the exported HTML and ensure notebookCode is empty
+        # Read the exported HTML and blank out the notebook code
         html = e_index.read_text()
-        # The export already has the code baked in - we need to blank it out
-        # Replace the notebookCode with empty string
+        
+        # Replace notebookCode value - match from 'notebookCode: "' to the closing '",'
+        # accounting for escaped quotes within the string
         import re
         html = re.sub(
-            r'notebookCode: ".*?"',
+            r'notebookCode: "((?:[^"\\]|\\.)*)"',
             'notebookCode: ""',
             html,
-            flags=re.DOTALL,
         )
         # Also blank out the marimo-code element content
         html = re.sub(
@@ -97,7 +97,7 @@ def main():
         .then(function(code) {{
           var encoded = encodeURIComponent(code);
           var iframe = document.createElement('iframe');
-          iframe.src = './e/#code/' + encoded;
+          iframe.src = './e/index.html#code/' + encoded;
           iframe.allow = 'cross-origin-isolated';
           iframe.style.width = '100%';
           iframe.style.height = '100%';
