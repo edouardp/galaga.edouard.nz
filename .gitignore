@@ -1,0 +1,29 @@
+# Build output
+dist/
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Linting and formatting
+.ruff_cache/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+Session.vim
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local

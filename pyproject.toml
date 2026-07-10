@@ -1,0 +1,9 @@
+[project]
+name = "galaga-edouard-nz"
+version = "0.1.0"
+description = "galaga.edouard.nz - Interactive marimo WASM notebooks"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "marimo",
+]
