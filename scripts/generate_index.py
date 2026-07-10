@@ -1,12 +1,16 @@
-"""Generate the site for galaga.edouard.nz using the iframe approach.
+"""Generate supporting files for galaga.edouard.nz.
 
-Architecture (matching marimo.app):
-1. /e/ — the marimo WASM runtime with empty notebookCode (static export)
-2. / and /?nb=<name> — landing page / iframe wrapper that loads /e/#code/<encoded>
+This script:
+1. Patches /e/index.html to blank out the embedded notebook code (the runtime
+   template is reused by Lambda@Edge which injects notebook code at request time)
+2. Generates a landing page (index.html) that lists available notebooks
 
-The /e/ page is served as a standard marimo WASM export. The parent page
-fetches the notebook .py file and passes it to the iframe via the URL hash.
-This works on mobile Safari because the iframe loads statically.
+In production, Lambda@Edge handles /?nb=<name> requests by fetching the notebook
+from S3 and injecting it into the /e/ runtime template. The landing page generated
+here is only served when no ?nb= parameter is present.
+
+For local development (`make serve`), the landing page uses an iframe + URL hash
+approach as a client-side fallback that doesn't require Lambda@Edge.
 """
 
 import json

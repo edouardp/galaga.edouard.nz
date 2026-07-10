@@ -4,6 +4,11 @@
 # =============================================================================
 # Builds marimo WASM notebooks and deploys to S3/CloudFront.
 #
+# S3 layout:
+#   /e/          — WASM runtime (long cache, immutable assets)
+#   /notebooks/  — raw .py files (short cache, read by Lambda@Edge)
+#   /index.html  — landing page (short cache, served when no ?nb= param)
+#
 # Usage:
 #   ./scripts/deploy.sh              # Build and deploy
 #   ./scripts/deploy.sh --skip-build # Deploy without rebuilding
@@ -46,17 +51,17 @@ DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
 
 echo "Syncing to S3 bucket: $BUCKET"
 
-# Sync /e/ (runtime assets) with long cache
+# Sync /e/ (runtime assets) — long cache, immutable hashed filenames
 aws s3 sync dist/e/ "s3://$BUCKET/e/" \
   --cache-control "public, max-age=31536000, immutable" \
   --size-only
 
-# Sync notebooks (short cache so updates propagate quickly)
+# Sync notebooks — short cache so updates propagate quickly
 aws s3 sync dist/notebooks/ "s3://$BUCKET/notebooks/" \
   --cache-control "public, max-age=60" \
   --delete
 
-# Sync root index.html (short cache)
+# Sync landing page — short cache
 aws s3 cp dist/index.html "s3://$BUCKET/index.html" \
   --cache-control "public, max-age=60"
 
