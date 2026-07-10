@@ -17,16 +17,16 @@ make serve            # Build and serve locally at http://localhost:8000
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `make install` | Install dependencies |
-| `make edit NB=hello` | Open a notebook in marimo editor |
-| `make new NB=name` | Create a new notebook |
-| `make build` | Export all notebooks to WASM HTML |
-| `make serve` | Build and serve locally |
-| `make deploy` | Build and deploy to galaga.edouard.nz |
-| `make infra` | Deploy AWS infrastructure (one-time) |
-| `make clean` | Remove build artifacts |
+| Command              | Description                           |
+| -------------------- | ------------------------------------- |
+| `make install`       | Install dependencies                  |
+| `make edit NB=hello` | Open a notebook in marimo editor      |
+| `make new NB=name`   | Create a new notebook                 |
+| `make build`         | Export all notebooks to WASM HTML     |
+| `make serve`         | Build and serve locally               |
+| `make deploy`        | Build and deploy to galaga.edouard.nz |
+| `make infra`         | Deploy AWS infrastructure (one-time)  |
+| `make clean`         | Remove build artifacts                |
 
 ## Infrastructure
 
