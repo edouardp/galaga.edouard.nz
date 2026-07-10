@@ -113,6 +113,8 @@ def main():
       .landing a:hover {{ text-decoration: underline; }}
     </style>
 
+    <marimo-code hidden=""></marimo-code>
+
     <script data-marimo="true">
       // Synchronous notebook loader - must run before module script
       (function() {{
@@ -153,8 +155,6 @@ def main():
         }});
       }})();
     </script>
-
-    <marimo-code hidden=""></marimo-code>
 
     <marimo-wasm hidden=""></marimo-wasm>
     <script>
