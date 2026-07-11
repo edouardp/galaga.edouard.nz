@@ -84,10 +84,11 @@ infra: ## Deploy CloudFormation infrastructure stack
 .PHONY: update-deps
 update-deps: ## Update dependencies (galaga latest, everything else 7-day lag)
 	@test -n "$(EXCLUDE_NEWER)" || { echo "Set EXCLUDE_NEWER manually"; exit 1; }
-	@echo "Upgrading galaga packages to latest..."
-	uv lock --upgrade-package galaga --upgrade-package galaga-marimo
-	@echo "Upgrading remaining packages (excluding uploads after $(EXCLUDE_NEWER))..."
-	uv lock --upgrade --exclude-newer "$(EXCLUDE_NEWER)"
+	@echo "Upgrading all packages (galaga latest, others capped at $(EXCLUDE_NEWER))..."
+	uv lock --upgrade \
+		--exclude-newer "$(EXCLUDE_NEWER)" \
+		--exclude-newer-package galaga=false \
+		--exclude-newer-package galaga-marimo=false
 	uv sync
 
 # ============================================================================
