@@ -4,6 +4,8 @@
 #   make              Show all available targets
 #   make <target>     Run a specific target
 
+EXCLUDE_NEWER := $(shell date -u -v-7d +%Y-%m-%dT00:00:00Z 2>/dev/null || date -u -d '7 days ago' +%Y-%m-%dT00:00:00Z 2>/dev/null)
+
 .PHONY: help
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -74,6 +76,19 @@ deploy-only: ## Deploy without rebuilding (uses existing dist/)
 .PHONY: infra
 infra: ## Deploy CloudFormation infrastructure stack
 	./scripts/infra.sh
+
+# ============================================================================
+# Dependencies
+# ============================================================================
+
+.PHONY: update-deps
+update-deps: ## Update dependencies (galaga latest, everything else 7-day lag)
+	@test -n "$(EXCLUDE_NEWER)" || { echo "Set EXCLUDE_NEWER manually"; exit 1; }
+	@echo "Upgrading galaga packages to latest..."
+	uv lock --upgrade-package galaga --upgrade-package galaga-marimo
+	@echo "Upgrading remaining packages (excluding uploads after $(EXCLUDE_NEWER))..."
+	uv lock --upgrade --exclude-newer "$(EXCLUDE_NEWER)"
+	uv sync
 
 # ============================================================================
 # Cleanup
