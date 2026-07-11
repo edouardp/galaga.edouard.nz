@@ -96,6 +96,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "galaga" },
     { name = "galaga-marimo" },
+    { name = "galaga-matrix" },
     { name = "marimo" },
 ]
 
@@ -103,6 +104,7 @@ dependencies = [
 requires-dist = [
     { name = "galaga", specifier = ">=1.7.5" },
     { name = "galaga-marimo", specifier = ">=1.7.5" },
+    { name = "galaga-matrix", specifier = ">=1.7.5" },
     { name = "marimo" },
 ]
 
@@ -117,6 +119,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/2e/61/1557d8f2522ddeb8785f6e5b9bf958f5610a8287b3fecff1d95514b3907b/galaga_marimo-1.7.6.tar.gz", hash = "sha256:da7fb11092ed415faa236674b92dedba5af833e6f02aa07ad6897456f4638ff5", size = 9748, upload-time = "2026-07-11T01:52:29.961Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/65/34/f212d74d1115b04e2b4144bf486cfbccd3f93337b4c726525abecb3035c0/galaga_marimo-1.7.6-py3-none-any.whl", hash = "sha256:19169902fc4f9fa7980b7b13ff1cfc2f43ca34a368c0346c702df02e29e01599", size = 6849, upload-time = "2026-07-11T01:52:30.955Z" },
+]
+
+[[package]]
+name = "galaga-matrix"
+version = "1.7.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "galaga" },
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/df/40fa5cb5dc1cbfde93ccc7fe6820d3b5580efc45ca21024db23ad220ed10/galaga_matrix-1.7.5.tar.gz", hash = "sha256:216935b9341147435389730c43a72dca0a310cd38453c7fa9b10871578d9c519", size = 80493, upload-time = "2026-07-10T05:19:45.628Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/51/aebb10159c7721d0abe9150b7342d6690c52264e147d51f8a3523aee60dc/galaga_matrix-1.7.5-py3-none-any.whl", hash = "sha256:b1fda90c3b9c97b9745f629ef3035fd8b0a1d7c19d819448d6c5a9ac64403c71", size = 22169, upload-time = "2026-07-10T05:19:44.379Z" },
 ]
 
 [[package]]

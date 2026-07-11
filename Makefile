@@ -88,7 +88,8 @@ update-deps: ## Update dependencies (galaga latest, everything else 7-day lag)
 	uv lock --upgrade \
 		--exclude-newer "$(EXCLUDE_NEWER)" \
 		--exclude-newer-package galaga=false \
-		--exclude-newer-package galaga-marimo=false
+		--exclude-newer-package galaga-marimo=false \
+		--exclude-newer-package galaga-matrix=false
 	uv sync
 
 # ============================================================================
