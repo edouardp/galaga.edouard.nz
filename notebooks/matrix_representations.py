@@ -80,7 +80,7 @@ def _(mo):
 def _(Algebra, from_matrix, gm, to_matrix):
     _alg = Algebra(2, 0, display_repr=True)
     _e1, _e2 = _alg.basis_vectors()
-    _e12 = _e1 * _e2
+    _e12 = _e1^_e2
 
     _m = (2 + 3 * _e1 - _e2 + 0.5 * _e12).name(latex="m")
 
