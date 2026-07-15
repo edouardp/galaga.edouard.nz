@@ -123,15 +123,15 @@ wheels = [
 
 [[package]]
 name = "galaga-matrix"
-version = "1.7.5"
+version = "1.7.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "galaga" },
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/67/df/40fa5cb5dc1cbfde93ccc7fe6820d3b5580efc45ca21024db23ad220ed10/galaga_matrix-1.7.5.tar.gz", hash = "sha256:216935b9341147435389730c43a72dca0a310cd38453c7fa9b10871578d9c519", size = 80493, upload-time = "2026-07-10T05:19:45.628Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/38/acb59dfb965c48be1278a8aefb53dd297d6bfbb4a0fd3fb136724f08c83f/galaga_matrix-1.7.6.tar.gz", hash = "sha256:67d8700b3ef3cd93f4c3aecb36e6946c9b42e6381cbea0a909cb46a7dcb6a353", size = 80496, upload-time = "2026-07-11T01:52:33.011Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/51/aebb10159c7721d0abe9150b7342d6690c52264e147d51f8a3523aee60dc/galaga_matrix-1.7.5-py3-none-any.whl", hash = "sha256:b1fda90c3b9c97b9745f629ef3035fd8b0a1d7c19d819448d6c5a9ac64403c71", size = 22169, upload-time = "2026-07-10T05:19:44.379Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/c5/842e077026456749fe8f7c98e6219e7b56ef7db1b123770050fa734ea4e1/galaga_matrix-1.7.6-py3-none-any.whl", hash = "sha256:dcd1954ab161c168e205a384f126df35e7e30f8e34c9ea78000ca3b2f21f386d", size = 22171, upload-time = "2026-07-11T01:52:34.163Z" },
 ]
 
 [[package]]
