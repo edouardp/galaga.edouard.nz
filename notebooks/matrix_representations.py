@@ -125,7 +125,7 @@ def _(Algebra, from_matrix, gm, to_matrix):
     _alg = Algebra(3, 0, display_repr=True)
     _e1, _e2, _e3 = _alg.basis_vectors()
 
-    _M = (
+    _m = (
         0.5
         + _e1
         - 2 * _e2
@@ -133,7 +133,7 @@ def _(Algebra, from_matrix, gm, to_matrix):
         + 0.25 * (_e1^_e2)
         - 0.5 * (_e2^_e3)
         + 1.25 * (_e1^_e2^_e3)
-    ).name(latex="M")
+    ).name(latex="m")
 
     gm.md(rt"""
     Start with basis-vector multivectors and convert them:
@@ -146,13 +146,13 @@ def _(Algebra, from_matrix, gm, to_matrix):
 
     The same conversion works for a mixed-grade multivector:
 
-    {_M}
+    {_m}
 
-    {to_matrix(_M)}
+    {to_matrix(_m)}
 
     And converting back from Matrix to Multivector preserves the roundtrip
 
-    {from_matrix(to_matrix(_M))}
+    {from_matrix(to_matrix(_m))}
     """)
     return
 
@@ -242,12 +242,12 @@ def _(mo):
 
 
 @app.cell
-def _(Algebra, from_matrix, gm, to_matrix):
-    _alg = Algebra(1, 3, display_repr=True)
+def _(Algebra, b_sta, from_matrix, gm, to_matrix):
+    _alg = Algebra(1, 3, blades=b_sta(), display_repr=True)
     _g0, _g1, _g2, _g3 = _alg.basis_vectors()
     _i = _g0^_g1^_g2^_g3
 
-    _a = (1 + _g0 - 0.5 * _g1 + 0.75 * (_g2 * _g3) + 0.2 * _i).name("a")
+    _a = (1 + _g0 + 0.75 * (_g2 * _g3) + 0.2 * _i).name("a")
     _b = (-0.5 + _g3 + 0.4 * (_g0 * _g2) - 0.3 * _i).name("b")
 
     _a_qmat = to_matrix(_a, mode="quaternion")
