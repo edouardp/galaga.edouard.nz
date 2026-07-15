@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.14"
 # dependencies = [
-#     "galaga>=1.7.5",
+#     "galaga>=1.7.6",
 #     "galaga-marimo",
 #     "marimo",
 # ]
@@ -42,10 +42,10 @@ def _(mo):
 
 @app.cell
 def _():
-    from galaga import Algebra, b_default
+    from galaga import Algebra, b_default, b_sta
     from galaga import BladeConvention
 
-    return Algebra, BladeConvention, b_default
+    return Algebra, BladeConvention, b_default, b_sta
 
 
 @app.cell(hide_code=True)
@@ -261,8 +261,9 @@ def _(mo):
 
 @app.cell
 def _(Algebra, b_default):
-    _alg = Algebra(3,
-        blades=b_default(prefix="v", style="wedge", overrides={"pss": "I"}),
+    _alg = Algebra(
+        3,
+        blades=b_default(prefix="v", style="wedge", pss="I"),
     )
     _basis = _alg.locals()
 
@@ -284,34 +285,41 @@ def _(mo):
 
 
 @app.cell
-def _(Algebra, BladeConvention):
-    _alg = Algebra(3, blades=BladeConvention(
-          vector_names=[
-              ("ex", "eₓ", r"e_x"),
-              ("ey", "eᵧ", r"e_y"),
-              ("ez", "e_z", r"e_z"),
-          ],
-          overrides={"pss": "i"},
-      ))
+def _(Algebra, b_default):
+    _alg = Algebra(3, blades=b_default(subscripts="xyz"))
     _basis = _alg.locals()
 
     _basis
     return
 
 
-app._unparsable_cell(
-    r"""
-    "I had a problem_alg = Algebra(3, blades=BladeConvention(
-          vector_names=["x", "y", "z"],
-          style="wedge",
-          overrides={"pss": "I"},
-      ))
+@app.cell
+def _(Algebra, BladeConvention):
+    _alg = Algebra(
+        3,
+        blades=BladeConvention(
+            vector_names=["x", "y", "z"],
+            style="wedge",
+            overrides={"pss": "I"},
+        ),
+    )
     _basis = _alg.locals()
 
     _basis
-    """,
-    name="_"
-)
+    return
+
+
+@app.cell
+def _(Algebra, b_sta):
+    _alg = Algebra(
+        1,
+        3,
+        blades=b_sta(sigmas=True, pseudovectors=True),
+    )
+    _basis = _alg.locals()
+
+    _basis
+    return
 
 
 @app.cell(hide_code=True)
