@@ -178,10 +178,11 @@ def _(mo):
 @app.cell
 def _(Algebra, b_sta, from_matrix, gm, np, to_matrix):
     _alg = Algebra(1, 3, blades=b_sta(), display_repr=True)
-    _g0, _g1, _g2, _g3 = _alg.basis_vectors(symbolic=True)
-    _i = _alg.pseudoscalar(symbolic=True)
+    _g0, _g1, _g2, _g3 = _alg.basis_vectors()
+    _i = _alg.pseudoscalar()
+    _matrix_identity = np.eye(4)
 
-    _M = (
+    _m = (
         1
         + 2 * _g0
         -     _g1
@@ -189,15 +190,9 @@ def _(Algebra, b_sta, from_matrix, gm, np, to_matrix):
         + 1.25 * (_g0^_g1)
         - 0.75 * (_g2^_g3)
         + 0.2 * _i
-    ).eval().name(latex="M")
-    _M_matrix = to_matrix(_M, mode="compact")
-    _M_back = from_matrix(_M_matrix)
-    _M_back.name(latex=r"\rho^{-1}(\rho(M))")
+    ).name(latex="m")
 
-    _identity_4 = np.eye(4)
-    _gamma_0_square_ok = np.allclose(_gamma_0 @ _gamma_0, _identity_4)
-    _gamma_1_square_ok = np.allclose(_gamma_1 @ _gamma_1, -_identity_4)
-    assert _gamma_0_square_ok and _gamma_1_square_ok
+
 
     gm.md(rt"""
     Start with spacetime basis-vector multivectors:
@@ -212,18 +207,18 @@ def _(Algebra, b_sta, from_matrix, gm, np, to_matrix):
 
     Their computed squares match the metric:
 
-    - $(\gamma^0)^2=+\mathbb I_4$: `{np.allclose(to_matrix(_g0) @ to_matrix(_g0),   _identity_4)}`
-    - $(\gamma^1)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g1) @ to_matrix(_g1), - _identity_4)}`
-    - $(\gamma^2)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g2) @ to_matrix(_g2), - _identity_4)}`
-    - $(\gamma^3)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g3) @ to_matrix(_g3), - _identity_4)}`
+    - $(\gamma^0)^2=+\mathbb I_4$: `{np.allclose(to_matrix(_g0) @ to_matrix(_g0),   _matrix_identity)}`
+    - $(\gamma^1)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g1) @ to_matrix(_g1), - _matrix_identity)}`
+    - $(\gamma^2)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g2) @ to_matrix(_g2), - _matrix_identity)}`
+    - $(\gamma^3)^2=-\mathbb I_4$: `{np.allclose(to_matrix(_g3) @ to_matrix(_g3), - _matrix_identity)}`
 
     A mixed-grade spacetime multivector roundtrips through the same basis:
 
-    {_M}
+    {_m}
 
-    {to_matrix(_M)}
+    {to_matrix(_m)}
 
-    {from_matrix(to_matrix(_M))}
+    {from_matrix(to_matrix(_m))}
     """)
     return
 
@@ -278,7 +273,7 @@ def _(Algebra, from_matrix, gm, to_matrix):
 
     {from_matrix(_a_qmat @ _b_qmat)}
 
-    Compare with the direct geometric product:
+    Compare with the direct geometric product of $a$ and $b$:
 
     {_a * _b}
     """)
