@@ -192,8 +192,6 @@ def _(Algebra, b_sta, from_matrix, gm, np, to_matrix):
         + 0.2 * _i
     ).name(latex="m")
 
-
-
     gm.md(rt"""
     Start with spacetime basis-vector multivectors:
 
